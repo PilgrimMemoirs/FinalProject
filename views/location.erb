@@ -1,4 +1,4 @@
-<<!DOCTYPE html> 
+<!DOCTYPE html> 
 <html>
   <head>
     <title>Simple Map</title>
@@ -20,14 +20,12 @@
     <h1>What is your starting and ending point? (Latitude and Longitude) :)</h1>
 
 
+<!-- Change action on this form and needs four fields -->
+  <form method="POST" action="/go"> 
+  <input type="text" name="starter" placeholder ="Start City">
+  <input type="text" name="ender" placeholder ="End City">
 
-  <form method="POST" action="/signup">
-  <input type=“text name=“longitude” placeholder ="Longitude">
-
-  <input type=“text name=“latitude” placeholder ="Latitude">
-
-
-
+<!-- Needs ending lat and long too!  -->
   <input type="submit">
 
   </form>
@@ -37,7 +35,7 @@
 
   <p><a href="/logout"> Logout </a></p>
   </body>
-</html>
+<!-- </html> -->
 
 <!-- keep doc type and things together -->
 
@@ -62,32 +60,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCrghSnHjAGYNiOPQbYwsatZcp4oNjRg4&callback=initMap"
     async defer></script>
   </body>
-</html>
 
-
-
-
-
-
-
-<html>
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-    <title>Simple markers</title>
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
     <script>
 
       function initMap() {
@@ -308,13 +281,6 @@
           position: {lat: 44.422573, lng: -110.586700},
           map: map,
         });
-
-
-
-
-
-
-
       }
     </script>
     <script async defer

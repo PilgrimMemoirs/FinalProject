@@ -2,6 +2,8 @@ require 'sinatra'
 require 'sinatra/activerecord'
 set :database, "sqlite3:activeapp.sqlite3"
 require './models/posts.rb'
+
+
 enable  :sessions
 
 
@@ -78,30 +80,31 @@ end
 
 
 
-
-get '/greet' do
+# Don't need
+# get '/greet' do
 	
-    erb :greet
-end
+#     erb :greet
+# end
 
-
-
-
-
+#? For what? 
 get '/location' do
     erb :location
 end
 
+#USE THIS! 
 post '/go' do
-    @lat = params[:lat]
-    @lon = params[:lon]
-    erb :index
+	@start = params[:ender]
+	@end = params[:starter]
+	puts params[:ender]
+	puts params[:starter]
 
+
+    erb :route
 end
 
 
-
-get '/post/:id' do 
-	@post = Post.find(params[:id])
-	erb :post
-end
+#Don't Need 
+# get '/post/:id' do 
+# 	@post = Post.find(params[:id])
+# 	erb :post
+# end
