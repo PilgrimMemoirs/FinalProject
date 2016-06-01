@@ -95,8 +95,6 @@ end
 post '/go' do
 	@start = params[:ender]
 	@end = params[:starter]
-	puts params[:ender]
-	puts params[:starter]
 
 
     erb :route
