@@ -2,13 +2,15 @@ require 'sinatra'
 require 'sinatra/activerecord'
 set :database, "sqlite3:activeapp.sqlite3"
 require './models/posts.rb'
-
-
 enable  :sessions
 
 
 get '/' do
-	erb :index
+	if session[:user_id]
+		redirect '/success'
+	else
+		erb :index
+	end
 end
 
 

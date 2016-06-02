@@ -16,6 +16,7 @@
       background-color: white;
       padding-right: 0 2%;
   }
+  footer { z-index: 10; position: absolute; bottom: 0; background-color: white; padding: 5%; border-radius: 0 5% 0 0}
 
 
 </style>
@@ -24,6 +25,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     
 <script type="text/javascript">
+
 
 var directionsDisplay = new google.maps.DirectionsRenderer(),
     directionsService = new google.maps.DirectionsService(),
@@ -38,6 +40,7 @@ var directionsDisplay = new google.maps.DirectionsRenderer(),
     myPolygons = [
     {
         "name": "Yosemite",
+        "website": "http://www.yosemite.com/",
         "coordinates": [
             "37.561543,-119.310037",
             "38.065666,-119.099618",
@@ -244,5 +247,6 @@ $(function() {
       <ul id="parks">  </ul>
   </header>
   <div id='map'></div>
+  <footer> <a href="/"> New Route </a> </footer>
 </body>
 </html>
