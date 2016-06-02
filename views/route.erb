@@ -1,80 +1,248 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Your Route</h1>
-    <div id="map"></div>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0; padding: 0; font-family: helvetica; }
+    #map { height: 99%; width: 99%; }
+    #map, html, body {padding: 0; margin: 0; height: 100%;      }
+ 
+    header {
+      z-index: 10;
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: white;
+      padding-right: 0 2%;
+  }
 
 
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=drawing,geometry"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    
+<script type="text/javascript">
+
+var directionsDisplay = new google.maps.DirectionsRenderer(),
+    directionsService = new google.maps.DirectionsService(),
+    polys    = new Array(),
+    map      = null,
+    zoom     = 10,
+    exist = new Array();
+    
+
+    // National park borders & info
+      // Could even add more data about national park w/ key value pairs
+    myPolygons = [
+    {
+        "name": "Yosemite",
+        "coordinates": [
+            "37.561543,-119.310037",
+            "38.065666,-119.099618",
+            "38.886838,-119.745115",
+            "38.953411,-120.842517",
+            "37.631437,-120.842517",
+        ]
+    },
+    {
+        "name": "zone2",
+        "coordinates": [
+            "51.56683,-0.22934",
+            "51.54292,-0.13046",
+            "51.57195,0",
+            "51.59755,-0.03708",
+            "51.5984,-0.13733",
+            "51.59755,-0.19913"
+        ]
+    },
+    {
+        "name": "zone3",
+        "coordinates": [
+            "51.66148,-0.13733",
+            "51.61461,-0.08514",
+            "51.61887,0.02197",
+            "51.65381,0.05905",
+            "51.64359,-0.04807"
+        ]
+    }
+    ];
 
 
-    <!-- IMPORTING GOOGLE MAPS -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCrghSnHjAGYNiOPQbYwsatZcp4oNjRg4&callback=initMap"
-    async defer>
-    </script>
 
-    <!-- GOOGLE MAPS FUNCTIONALITY -->
-    <script>
-      console.log("<%= @start%>");
-      console.log("<%= @end%>");
-      function initMap() {
-        var start_location = "<%= @start%>";
-        var end_location = "<%= @end%>";
-        
-        var myOptions = {
-          zoom: 10,
-          center: new google.maps.LatLng(40.84, 14.25),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var mapObject = new google.maps.Map(document.getElementById("map"), myOptions);
+// Sets up polygon outlining park over map. 
+function drawPolygon(poly, polyLabel) {
+    console.log('drawPolygon...');
+    
+    var options = { 
+        paths: poly,
+        strokeColor: '#AA2143',
+        strokeOpacity: 1,
+        strokeWeight: 2,
+        fillColor: "#FF6600",
+        fillOpacity: 0.7,
+        polyTitle: polyLabel    
+    };
+    
+    newPoly = new google.maps.Polygon(options);
+    newPoly.setMap(map);
+    // Adding Google Polygon object to the array set earlier
+    polys.push(newPoly);
+    console.log('polys length: ' + polys.length);
+}
 
-        var directionsService = new google.maps.DirectionsService();
 
-        var directionsRequest = {
-          origin: start_location,
-          destination: end_location,
-          travelMode: google.maps.DirectionsTravelMode.DRIVING,
-          unitSystem: google.maps.UnitSystem.METRIC
-        };
-
-        directionsService.route(
-                  directionsRequest,
-                  function(response, status)
-                  {
-                    if (status == google.maps.DirectionsStatus.OK)
-                    {
-                      new google.maps.DirectionsRenderer({
-                        map: mapObject,
-                        directions: response
-                      });
-                    }
-                    else
-                      $("#error").append("Unable to retrieve your route<br />");
-                  }
-                );
+// Actually draws the polygons on map. 
+function sendPolygonForDrawing() {
+    console.log('sendPolygonForDrawing...');
+    
+    for(var i = 0; i < myPolygons.length; i++){
+        poly = new Array();
+        var coord = myPolygons[i].coordinates;
+        var lng = coord.length;
+        for (var j = 0; j < lng; j++){
+            var longit_Latid = coord[j].split(',');
+            poly.push(new google.maps.LatLng(parseFloat(longit_Latid[0]), parseFloat(longit_Latid[1])));
         }
+        
+        drawPolygon(poly, myPolygons[i].name);
+              // 
+        poly.pop();
+    }   
+}
+  
+//Route
+function calcRoute(start, end) {
+    console.log('calcRoute...');
+    
+    var start = start;
+    var end = end;
+
+
+ // Commented out waypoints. 
+     // var waypts = [];
+    // var waysArray = ["London"];
+    
+    // for (var i = 0; i < waysArray.length; i++) {
+    //     waypts.push({
+    //         location: waysArray[i],
+    //         stopover:true
+    //     });
+    // }
+    // console.log('waypoints:');
+    // console.log(waypts);
+    
+    var request = {
+        origin: start,
+        destination: end,
+        // waypoints: waypts,
+        // optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.DRIVING
+    };
+
+    directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(response);
+            console.log(response);
+            
+            var routCoordinates = fncRouteZoneIntersection(response);//this function populates the routCoordinates with the JSON data of the route.
+
+            // var exist = new Array();
+            
+            for (var i = 0; i < polys.length; i++) {
+                for (var j = 0; j < routCoordinates.length; j++){
+
+// ***************************************************************
+// ********************* PAY SPECIAL ATTENTION *******************
+// ***************************************************************
+
+                  // Use this to display a national park or not if a coordinate along the route intersects with it. 
+                    if (google.maps.geometry.poly.containsLocation(routCoordinates[j], polys[i]) == true){
+                        console.log('inside!');
+                        exist.push(polys[i].polyTitle);
+                        $('#parks').append("<li>"+ polys[i].polyTitle +" </li>")
+                        break;
+                        /*this breaks the loop checking when a point is found inside a polygon 
+                    and go check the next one, because knowing that one point of the route is 
+                    inside a polygon is enough*/
+                    }
+                }
+            }
+            
+            console.log(exist);
+            return exist;
+            //alert(exist);
+        }
+    });
+
+    directionsDisplay.setMap(map); 
+}
 
 
 
-    </script>
-  </body>
+
+
+
+
+function fncRouteZoneIntersection(response) {
+    console.log('fncRouteZoneIntersection...');
+    var myRoute = response.routes[0].overview_path;
+    var lngLatCordinates = new Array();
+
+    for (var i = 0; i < myRoute.length; i++) {
+
+ // ######## COMMENTED OUT / WAS PUTTING THE MARKERS ALONG ROUTE ###### //
+ // ################################################################### //
+
+        // var marker = new google.maps.Marker({
+        //     map: map,
+        //     position: myRoute[i]
+        // });
+        lngLatCordinates.push(myRoute[i]);
+    }
+    return lngLatCordinates;
+}
+
+
+$(function() {
+    //Basic
+    var cartodbMapOptions = {
+        zoom: zoom,
+        center: new google.maps.LatLng(41.8781, 87.6298),
+        disableDefaultUI: false,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+
+    // Init the map
+    map = new google.maps.Map(document.getElementById("map"),cartodbMapOptions);
+    // sendPolygonForDrawing();
+    calcRoute("<%= @start %>", "<%= @end %>");
+    console.log(exist);
+    sendPolygonForDrawing();
+
+    var drawingManager = new google.maps.drawing.DrawingManager({
+        drawingControl: false,
+        polygonOptions: {
+            fillColor: '#0099FF',
+            fillOpacity: 0.7,
+            strokeColor: '#AA2143',
+            strokeWeight: 2,
+            clickable: true,
+            zIndex: 1,
+            editable: true
+        }
+    });
+});
+
+</script>
+</head>
+
+<body>
+  <header>
+      <h1> Parks to visit </h1>
+      <ul id="parks">  </ul>
+  </header>
+  <div id='map'></div>
+</body>
 </html>
-
-
-
